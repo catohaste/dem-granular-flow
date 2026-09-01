@@ -5,7 +5,6 @@ Run locally (venv), not in Docker:
     python analysis/make_gif.py [run_name]
 """
 
-import math
 import sys
 from pathlib import Path
 
@@ -17,50 +16,80 @@ BOX_SIZE = (0.1, 0.1, 0.1)  # keep in sync with scripts/granular_jamming.py
 
 
 def load_frame(path):
-    xs, zs, rs = [], [], []
+    xs, ys, zs, rs = [], [], [], []
+
     with open(path) as f:
         for line in f:
-            x, _y, z, r = (float(v) for v in line.split())
+            x, y, z, r = (float(v) for v in line.split())
             xs.append(x)
+            ys.append(y)
             zs.append(z)
             rs.append(r)
-    return xs, zs, rs
+
+    return xs, ys, zs, rs
 
 
 def main():
     run_name = sys.argv[1] if len(sys.argv) > 1 else "default"
     frames_dir = OUTPUT_DIR / "frames" / run_name
-    frame_paths = sorted(frames_dir.glob("frame_*.txt"))
+
+    # limit to first 100 frames to reduce output filesize
+    # and cut uninteresting frames
+    frame_paths = sorted(frames_dir.glob("frame_*.txt"))[:100]
+
     if not frame_paths:
         raise SystemExit(f"No frames found in {frames_dir}")
 
-    fig, ax = plt.subplots(figsize=(5, 5))
-    ax.set_xlim(0, BOX_SIZE[0])
-    ax.set_ylim(0, BOX_SIZE[2])
-    ax.set_aspect("equal")
-
-    def radius_to_marker_size(r):
-        # convert a data-space radius to a scatter `s` (marker area in points^2)
-        # so particle sizes on the GIF actually match their simulated radius
-        px_per_unit = ax.transData.transform((1, 0))[0] - ax.transData.transform((0, 0))[0]
-        points_per_px = 72.0 / fig.dpi
-        radius_points = r * px_per_unit * points_per_px
-        return math.pi * radius_points**2
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111, projection="3d")
 
     def draw(i):
         ax.clear()
+
+        # Set the simulation box
         ax.set_xlim(0, BOX_SIZE[0])
-        ax.set_ylim(0, BOX_SIZE[2])
-        xs, zs, rs = load_frame(frame_paths[i])
-        sizes = [radius_to_marker_size(r) for r in rs]
-        ax.scatter(xs, zs, s=sizes, c=rs, cmap="viridis")
-        ax.set_xlabel("x (m)")
-        ax.set_ylabel("z (m)")
-        ax.set_title(f"{run_name} — frame {i + 1}/{len(frame_paths)}")
+        ax.set_ylim(0, BOX_SIZE[1])
+        ax.set_zlim(0, BOX_SIZE[2])
+
+        ax.set_box_aspect(BOX_SIZE)
+        ax.grid(False)
+
+        ax.view_init(elev=15, azim=-60)
+
+        # Load particle positions
+        xs, ys, zs, rs = load_frame(frame_paths[i])
+
+        sizes = [r * 1000 * 100 for r in rs]  # scale radii for visualization
+        ax.scatter(
+            xs,
+            ys,
+            zs,
+            s=sizes,
+            color="steelblue",
+            # alpha=1,
+            depthshade=True,
+            edgecolors="black",
+        )
+
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.set_zticklabels([])
+
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_zticks([])
+
+        # ax.set_xlabel("x")
+        # ax.set_ylabel("y")
+        # ax.set_zlabel("z")
+        ax.set_title(
+            f"{run_name}\nframe {i + 1}/{len(frame_paths)}"
+        )
 
     writer = PillowWriter(fps=12)
     out_path = OUTPUT_DIR / f"{run_name}.gif"
-    with writer.saving(fig, out_path, dpi=100):
+
+    with writer.saving(fig, out_path, dpi=80):
         for i in range(len(frame_paths)):
             draw(i)
             writer.grab_frame()
