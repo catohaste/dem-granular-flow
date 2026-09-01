@@ -7,13 +7,13 @@ Run locally (venv), not in Docker:
 
 import sys
 from pathlib import Path
+import os
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
-BOX_SIZE = (0.1, 0.1, 0.1)  # keep in sync with scripts/granular_jamming.py
-
+BOX_SIZE = tuple(map(float, os.environ["BOX_SIZE"].split(",")))
 
 def load_frame(path):
     xs, ys, zs, rs = [], [], [], []

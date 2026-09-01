@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Gravity deposition in a box: spheres settle under gravity and jam. Adapted
-from Yade's own gravity_tutorial.py example, but running headlessly (no
+Gravity deposition in a box: spheres settle under gravity. Adapted from 
+Yade's own gravity_tutorial.py example, but running headlessly (no
 interactive plot window) and configurable via environment variables.
 
 Run inside the official YADE Docker image (YADE has no native macOS build):
@@ -30,7 +30,7 @@ import os
 
 from yade import pack, plot
 
-BOX_SIZE = (0.1, 0.1, 0.1)  # meters
+BOX_SIZE = tuple(map(float, os.environ["BOX_SIZE"].split(",")))
 BOX_VOLUME = BOX_SIZE[0] * BOX_SIZE[1] * BOX_SIZE[2]
 NUM_PARTICLES = int(os.environ.get("NUM_PARTICLES", 500))
 R_MEAN = float(os.environ.get("R_MEAN", 0.005))  # mean sphere radius, meters
@@ -114,7 +114,7 @@ def snapshot():
 
 O.saveTmp()
 O.run(MAX_ITER, True)
-plot.saveDataTxt(os.path.join(OUTPUT_DIR, "packing_%s.txt" % RUN_NAME))
+plot.saveDataTxt(os.path.join(OUTPUT_DIR, "packing%s.txt" % RUN_NAME))
 
 # Append this run's final packing fraction for cross-run comparison
 summary_path = os.path.join(OUTPUT_DIR, "summary.csv")
