@@ -69,10 +69,10 @@ O.engines = [
     NewtonIntegrator(gravity=(0, 0, -9.81), damping=0.4),
     # call the checkUnbalanced function (defined below) every 2 seconds
     PyRunner(command="checkUnbalanced()", realPeriod=2),
-    # call the track function every 200 steps to record the packing fraction
-    PyRunner(command="track()", iterPeriod=200),
-    # call the snapshot function every 500 steps to save a GIF frame
-    PyRunner(command="snapshot()", iterPeriod=500),
+    # call the track function every 0.01 seconds to record the packing fraction
+    PyRunner(command="track()", virtPeriod=0.01),
+    # call the snapshot function every 0.025 seconds to save a GIF frame
+    PyRunner(command="snapshot()", virtPeriod=0.025),
 ]
 O.dt = 0.5 * PWaveTimeStep()
 
@@ -99,12 +99,12 @@ def checkUnbalanced():
 
 # collect history of data which will be saved to packing_<run_name>.txt
 def track():
-    plot.addData(i=O.iter, packingFraction=current_packing_fraction())
+    plot.addData(i=O.time, packingFraction=current_packing_fraction())
 
 
 def snapshot():
     # x y z r per sphere, one file per frame, for rendering a GIF later
-    path = os.path.join(FRAMES_DIR, "frame_%06d.txt" % O.iter)
+    path = os.path.join(FRAMES_DIR, "t_%.4f.txt" % O.time)
     with open(path, "w") as f:
         for b in O.bodies:
             if isinstance(b.shape, Sphere):

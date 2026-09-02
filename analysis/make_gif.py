@@ -35,7 +35,7 @@ def main():
 
     # limit to first 100 frames to reduce output filesize
     # and cut uninteresting frames
-    frame_paths = sorted(frames_dir.glob("frame_*.txt"))[:100]
+    frame_paths = sorted(frames_dir.glob("t_*.txt"))[:40]
 
     if not frame_paths:
         raise SystemExit(f"No frames found in {frames_dir}")
@@ -82,8 +82,10 @@ def main():
         # ax.set_xlabel("x")
         # ax.set_ylabel("y")
         # ax.set_zlabel("z")
+
+        time_str = frame_paths[i].stem.split("_")[1]
         ax.set_title(
-            f"{run_name}\nframe {i + 1}/{len(frame_paths)}"
+            f"{run_name}\nt = {time_str} s"
         )
 
     writer = PillowWriter(fps=12)
