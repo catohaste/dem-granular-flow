@@ -1,6 +1,12 @@
 # dem-granular-flow
 DEM simulations of granular flow, exploring how particle size affects jamming. Built for a public outreach demo.
 
+<p align="center">
+  <img src="demo/_fine.gif" width="150" />
+  <img src="demo/_medium.gif" width="150" />
+  <img src="demo/_coarse.gif" width="150" />
+</p>
+
 ## Running simulations (YADE via Docker)
 [YADE](https://yade-dem.org/) has no native macOS build, so simulations run
 inside its official Linux Docker image.
