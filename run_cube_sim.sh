@@ -31,9 +31,9 @@ for run in "${runs[@]}"; do
         -v "$PWD/scripts:/scripts" \
         -v "$PWD/output:/output" \
         "$IMAGE" \
-        yade -n -x /scripts/granular_jamming.py
+        yade -n -x /scripts/cube_granules.py
 
-    python analysis/make_gif.py $RUN_NAME
+    python analysis/make_gif_cube.py $RUN_NAME
 done
 
 echo "All simulations completed."

@@ -18,10 +18,10 @@ inside its official Linux Docker image.
 ```
 docker run --rm -v "$PWD/scripts:/scripts" -v "$PWD/output:/output" \
        registry.gitlab.com/yade-dev/docker-prod:ubuntu22.04 \
-       yade -n -x /scripts/granular_jamming.py
+       yade -n -x /scripts/cube_granules.py
 ```
 
-`scripts/granular_jamming.py` drops a cloud of spheres into a box under
+`scripts/cube_granules.py` drops a cloud of spheres into a box under
 gravity so you can explore how particle size/spread affects jamming. Each run
 writes to several files to the `output/` folder
 - `packing_<run_name>.txt` - packing fraction vs. iteration
@@ -35,7 +35,7 @@ particle sizes, e.g. a finer pack:
     docker run --rm -e RUN_NAME=fine -e R_MEAN=0.003 -e R_REL_FUZZ=0.1 \
         -v "$PWD/scripts:/scripts" -v "$PWD/output:/output" \
         registry.gitlab.com/yade-dev/docker-prod:ubuntu22.04 \
-        yade -n -x /scripts/granular_jamming.py
+        yade -n -x /scripts/cube_granules.py
 ```
 
 On Apple Silicon you'll see a `platform (linux/amd64) does not match ...`
@@ -51,6 +51,6 @@ The venv is only used for post-processing/plotting outside the container.
     pip install -r requirements.txt
 
     python analysis/plot_packing.py <run_name>     # packing fraction vs. time
-    python analysis/make_gif.py <run_name>         # animated GIF of the run
+    python analysis/make_gif_cube.py <run_name>    # animated GIF of the run
     python analysis/compare_packing.py             # packing density vs. particle size,
                                                    # across all rows in output/summary.csv
