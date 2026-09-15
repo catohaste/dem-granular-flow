@@ -1,6 +1,14 @@
 # To-do list
 
-- add funnel shaped hopper (with no obstacle)
+- add funnel shaped hopper (with no obstacle) STARTED
+  - improve the gif output
+    - remove the bottom plane of the plot
+    - add in visible hopper walls
+    - improve framing of hopper
+- experiment with different particle sizes
+- create summary visual
+- add hopper runs to README
+- add YADE instructions to README
 
 ## Done
 
