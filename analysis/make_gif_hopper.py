@@ -5,25 +5,50 @@ Run locally (venv), not in Docker:
     python analysis/make_gif_hopper.py [run_name]
 """
 
+import math
 import os
 import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 
 # geometry env vars, matching the defaults in scripts/hopper_granules.py, used
 # to fix the plot bounds so the funnel doesn't jump around between frames
+N_SIDES = int(os.environ.get("N_SIDES", 6))
 TOP_RADIUS = float(os.environ.get("TOP_DIAMETER", 0.1)) / 2
+APERTURE_RADIUS = float(os.environ.get("APERTURE_DIAMETER", 0.05)) / 2
 HOPPER_HEIGHT = float(os.environ.get("HOPPER_HEIGHT", 0.08))
 
 XY_HALF = TOP_RADIUS * 1.5  # a bit wider than the top opening, purely for framing
+Z_APERTURE = 0.0
 Z_TOP = HOPPER_HEIGHT
 # there's no catch plate anymore, so pick a viewing depth below the aperture
 # (one hopper-height) that's just enough to show particles discharging
 Z_BOTTOM = -HOPPER_HEIGHT
+
+
+def ring_vertices(radius, z):
+    # N_SIDES points evenly spaced around a circle of given radius, at height z
+    return [
+        (radius * math.cos(2 * math.pi * i / N_SIDES), radius * math.sin(2 * math.pi * i / N_SIDES), z)
+        for i in range(N_SIDES)
+    ]
+
+
+def hopper_wall_faces():
+    # one trapezoidal quad per wall, mirroring the frustum built in scripts/hopper_granules.py
+    bottom_ring = ring_vertices(APERTURE_RADIUS, Z_APERTURE)
+    top_ring = ring_vertices(TOP_RADIUS, Z_TOP)
+
+    faces = []
+    for i in range(N_SIDES):
+        j = (i + 1) % N_SIDES
+        faces.append([bottom_ring[i], top_ring[i], top_ring[j], bottom_ring[j]])
+    return faces
 
 
 def load_frame(path):
@@ -52,9 +77,15 @@ def main():
 
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111, projection="3d")
+    wall_faces = hopper_wall_faces()
 
     def draw(i):
         ax.clear()
+
+        walls = Poly3DCollection(
+            wall_faces, facecolors="tan", edgecolors="saddlebrown", linewidths=0.5, alpha=0.2
+        )
+        ax.add_collection3d(walls)
 
         # Fixed bounds spanning the wide top opening down to the catch plate
         ax.set_xlim(-XY_HALF, XY_HALF)
@@ -62,9 +93,9 @@ def main():
         ax.set_zlim(Z_BOTTOM, Z_TOP)
 
         ax.set_box_aspect((2 * XY_HALF, 2 * XY_HALF, Z_TOP - Z_BOTTOM))
-        ax.grid(False)
+        ax.set_axis_off()
 
-        ax.view_init(elev=15, azim=-60)
+        ax.view_init(elev=15, azim=-45)
 
         # Load particle positions
         xs, ys, zs, rs = load_frame(frame_paths[i])
@@ -79,14 +110,6 @@ def main():
             depthshade=True,
             edgecolors="black",
         )
-
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        ax.set_zticklabels([])
-
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_zticks([])
 
         time_str = frame_paths[i].stem.split("_")[1]
         ax.set_title(f"{run_name}\nt = {time_str} s")
