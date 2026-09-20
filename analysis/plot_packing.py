@@ -27,7 +27,7 @@ def load(run_name):
 
 
 def main():
-    run_name = sys.argv[1] if len(sys.argv) > 1 else "default"
+    run_name = sys.argv[1] if len(sys.argv) > 1 else "_default"
     iters, fractions = load(run_name)
 
     fig, ax = plt.subplots()

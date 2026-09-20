@@ -1,8 +1,8 @@
 """
-Render an animated GIF from a run's per-frame particle snapshots.
+Render an animated GIF from a cube run's per-frame particle snapshots.
 
 Run locally (venv), not in Docker:
-    python analysis/make_gif.py [run_name]
+    python analysis/make_gif_cube.py [run_name]
 """
 
 import sys
@@ -30,7 +30,7 @@ def load_frame(path):
 
 
 def main():
-    run_name = sys.argv[1] if len(sys.argv) > 1 else "default"
+    run_name = sys.argv[1] if len(sys.argv) > 1 else "_default"
     frames_dir = OUTPUT_DIR / "frames" / run_name
 
     # limit to first 100 frames to reduce output filesize

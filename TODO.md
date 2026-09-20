@@ -1,8 +1,19 @@
 # To-do list
 
-- add funnel shaped hopper (with no obstacle)
+- experiment with different particle sizes
+- experiment with switch to viscoelastic (ViscElMat from FrictMat)
+- show effect of randomness (not every simulation is the same)
+  - measure chance of jamming for particle sizes, via multiple runs with same parameters
+- create summary visual
 
 ## Done
+
+- Add funnel shaped hopper
+  - improve the gif output
+    - remove the bottom plane of the plot
+    - add in visible hopper walls
+    - improve framing of hopper
+  - add hopper runs to README
 
 - why does it look like the simulation is slower for small particles?
 

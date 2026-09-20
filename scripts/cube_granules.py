@@ -7,7 +7,7 @@ interactive plot window) and configurable via environment variables.
 Run inside the official YADE Docker image (YADE has no native macOS build):
     docker run --rm -v "$PWD/scripts:/scripts" -v "$PWD/output:/output" \
         registry.gitlab.com/yade-dev/docker-prod:ubuntu22.04 \
-        yade -n -x /scripts/granular_jamming.py
+        yade -n -x /scripts/cube_granules.py
 
 -n runs headless (no GUI) and -x exits automatically once the script finishes,
 rather than dropping into YADE's interactive console.
@@ -17,7 +17,7 @@ runs, e.g.:
     docker run --rm -e RUN_NAME=fine -e R_MEAN=0.003 -e R_REL_FUZZ=0.1 \
         -v "$PWD/scripts:/scripts" -v "$PWD/output:/output" \
         registry.gitlab.com/yade-dev/docker-prod:ubuntu22.04 \
-        yade -n -x /scripts/granular_jamming.py
+        yade -n -x /scripts/cube_granules.py
 
 Each run writes per-frame particle snapshots (for GIF rendering), a packing
 fraction time series, and an appended row to output/summary.csv (for
@@ -35,7 +35,7 @@ BOX_VOLUME = BOX_SIZE[0] * BOX_SIZE[1] * BOX_SIZE[2]
 NUM_PARTICLES = int(os.environ.get("NUM_PARTICLES", 500))
 R_MEAN = float(os.environ.get("R_MEAN", 0.005))  # mean sphere radius, meters
 R_REL_FUZZ = float(os.environ.get("R_REL_FUZZ", 0.3))  # relative size spread
-RUN_NAME = os.environ.get("RUN_NAME", "default")
+RUN_NAME = os.environ.get("RUN_NAME", "_default")
 MAX_ITER = int(os.environ.get("MAX_ITER", 200000))  # safety cap; usually stops earlier
 
 OUTPUT_DIR = "/output"
